@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.6/css/all.css">
     <link rel="stylesheet" href="./css/global.css">
-    <script> if ("serviceWorker" in navigator) { navigator.serviceWorker.register("service-worker.js"); } </script>
     <title>Group work </title>
 </head>
 <body>
@@ -25,24 +25,29 @@
                         All of the <strong>Lessons</strong> available this year.
                     </p>
                 </div>
+                <cart-component
+                        :phoneItem="this.phoneItem"
+                        :nameItem="this.nameItem"
+                        :valid="valid"
+                        :isCartOpen="this.isCartOpen" :isSuccessOrder="this.isSuccessOrder"
+                        :cart="this.cart"></cart-component>
             </div>
 
-            <cart-component></cart-component>
+            <lessons-component :lessons="this.lessons" :cart="this.cart"></lessons-component>
             <checkout-component></checkout-component>
-
-            <lessons-component></lessons-component>
         </div>
     </section>
 </div>
 
+<!--Service Worker-->
+<script src="js/register.js" type="module"></script>
+
 <!-- Vue components unpack -->
 <script src="https://cdn.jsdelivr.net/npm/vue@2.5.1/dist/vue.min.js"></script>
 
-<!-- Internal Files -->
-<script src="index.js" type="module"></script>
-
+<!--Vue modules-->
 <script type="module">
-    import vueState from './index.js'
+    import vueState from './js/index.js'
 
     new Vue(vueState)
 </script>

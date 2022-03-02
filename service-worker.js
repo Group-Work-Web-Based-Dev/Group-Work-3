@@ -1,22 +1,37 @@
-var cacheName = 'After School Lessons-v1';
-var cacheFiles = [
-    'index.html',
+const cacheName = 'v1'
 
-];
+function installApp() {
+    return self.addEventListener('install', (event) => {
+        event.waitUntil(
+            caches.open(cacheName)
+                .then((cache) => {
+                    return cache.addAll(
+                        [
+                            '/index.html',
+                            '/images/artimg.png',
+                            '/images/comimg.png',
+                            '/images/draimg.png',
+                            '/images/engimg.png',
+                            '/images/geoimg.png',
+                            '/images/hisimg.png',
+                            '/images/mathimg.png',
+                            '/images/musimg.png',
+                            '/images/sciimg.png',
+                            '/images/spoimg.png',
+                            '/css/global.css',
+                            'https://cdn.jsdelivr.net/npm/vue@2.5.1/dist/vue.min.js',
+                            '/js/components/cart.js',
+                            '/js/components/checkout.js',
+                            '/js/components/lessons.js',
+                            '/js/index.js',
+                            '/js/data.js',
+                        ]
+                    ).catch(err => {
+                        console.error(`Error when installing service worker [${err}]`)
+                    })
+                })
+        )
+    })
+}
 
-self.addEventListener('install', (e) => {
-    console.log('[Service Worker] Install');
-    e.waitUntil(caches.open(cacheName).then((cache) => {
-        console.log('[Service Worker] Caching all the files');
-        return cache.addAll(cacheFiles);
-    }));
-});
-
-
-self.addEventListener('fetch', function (e) {
-    e.respondWith(// check if the cache has the file 
-        caches.match(e.request).then(function (r) {
-            console.log('[Service Worker] Fetching resource: ' + e.request.url);
-            // 'r' is the matching file if it exists in the cachereturn r     
-        }));
-});
+installApp();
