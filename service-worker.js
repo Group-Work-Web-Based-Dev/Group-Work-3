@@ -18,6 +18,8 @@ function installApp() {
                             '/images/musimg.png',
                             '/images/sciimg.png',
                             '/images/spoimg.png',
+                            '/icons/icon192.png',
+                            '/icons/icon512.png',
                             '/css/global.css',
                             'https://cdn.jsdelivr.net/npm/vue@2.5.1/dist/vue.min.js',
                             '/js/components/cart.js',
