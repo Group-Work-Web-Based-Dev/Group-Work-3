@@ -30,10 +30,10 @@ self.addEventListener('install', (event) => {
     )
 })
 
-self.addEventListener('activate', function (event) {
-    console.log('Claiming control');
-    return self.clients.claim();
-});
+// self.addEventListener('activate', function (event) {
+//     console.log('Claiming control');
+//     return self.clients.claim();
+// });
 
 self.addEventListener('fetch', (event) => {
     if (!(event.request.url.indexOf('http') === 0)) return; // skip the request. if request is not made with http protocol
