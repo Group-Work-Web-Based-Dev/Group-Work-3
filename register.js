@@ -1,7 +1,7 @@
 // register service worker
 if ('serviceWorker' in navigator) {
     let state;
-    navigator.serviceWorker.register('/group-work-3/service-worker.js', {scope: '/group-work-3/'})
+    navigator.serviceWorker.register('/service-worker.js')
 
         .then(res => {
             switch (res) {
