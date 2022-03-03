@@ -30,23 +30,23 @@ self.addEventListener('install', (event) => {
     )
 })
 
-// self.addEventListener('activate', function (event) {
-//     console.log('Claiming control');
-//     return self.clients.claim();
-// });
-//
-// self.addEventListener('fetch', (event) => {
-//     event.respondWith(
-//         caches.match(event.request).then(
-//             cacheRes =>
-//                 cacheRes ||
-//                 fetch(event.request).then(fetchRes =>
-//                     caches.open(cacheName).then(async cache => {
-//                         cache.put(event.request.url, fetchRes.clone()).then(res => {
-//                             console.log(`Successfully saved [${res}]`)
-//                         }).catch(() => cache.match(event.request.url))
-//                         return fetchRes;
-//                     })
-//                 )
-//         ).catch(err => console.error(`Error fetch ${err}`)))
-// })
+self.addEventListener('activate', function (event) {
+    console.log('Claiming control');
+    return self.clients.claim();
+});
+
+self.addEventListener('fetch', (event) => {
+    event.respondWith(
+        caches.match(event.request).then(
+            cacheRes =>
+                cacheRes ||
+                fetch(event.request).then(fetchRes =>
+                    caches.open(cacheName).then(async cache => {
+                        cache.put(event.request.url, fetchRes.clone()).then(res => {
+                            console.log(`Successfully saved [${res}]`)
+                        }).catch(() => cache.match(event.request.url))
+                        return fetchRes;
+                    })
+                )
+        ).catch(err => console.error(`Error fetch ${err}`)))
+})
