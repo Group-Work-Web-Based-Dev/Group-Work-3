@@ -1,7 +1,8 @@
 // register service worker
 if ('serviceWorker' in navigator) {
     let state;
-    navigator.serviceWorker.register('/service-worker.js')
+    navigator.serviceWorker.register('/group-work-3/service-worker.js', {scope: '/group-work-3/'})
+
         .then(res => {
             switch (res) {
                 case res.installing:
@@ -18,7 +19,9 @@ if ('serviceWorker' in navigator) {
             }
 
             console.log(state);
-        })
+        }).catch(err => {
+        console.log(`New - [Error] loading service worker... ${err}`)
+    })
 } else {
     console.error(`Service worker not available in navigator`)
 }
