@@ -1,8 +1,7 @@
 // register service worker
 if ('serviceWorker' in navigator) {
     let state;
-    navigator.serviceWorker.register('/service-worker.js')
-
+    navigator.serviceWorker.register('service-worker.js')
         .then(res => {
             switch (res) {
                 case res.installing:
