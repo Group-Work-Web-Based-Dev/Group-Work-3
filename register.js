@@ -19,7 +19,7 @@ if ('serviceWorker' in navigator) {
 
             console.log(state);
         }).catch(err => {
-        console.log(`Error loading service worker... ${err}`)
+        console.log(`!!! [Error] loading service worker... ${err}`)
     })
 } else {
     console.error(`Service worker not available in navigator`)
