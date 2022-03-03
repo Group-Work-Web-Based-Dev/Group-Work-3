@@ -1,59 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.6/css/all.css">
+    <title>After School Club</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+    <link rel="stylesheet"
+          href ="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <link rel="stylesheet" href="./css/global.css">
-    <link rel="manifest" href="lesson.webmanifest">
-
-    <title>Group work </title>
+    <script src="register.js" ></script>
 </head>
+
 <body>
-
 <div id="app">
-    <section class="section">
+    <header>
+        <h1 v-text="sitename"></h1>
+        <!--Start Cart-->
+        <button @click='showCheckout'>
+            {{this.cart.length}}
+            <span class="fas fa-shopping-basket"></span> Checkout
+        </button>
+    </header>
+    <!--End Cart-->
 
-        <div class="container mt-1">
-            <div class="header-container">
-                <div class="is-fluid mb-5">
-                    <h1 class="title">
-                        Course List
-                    </h1>
-                    <p class="pt-2 subtitle">
-                        All of the <strong>Lessons</strong> available this year.
-                    </p>
-                </div>
-                <cart-component
-                        :phoneItem="this.phoneItem"
-                        :nameItem="this.nameItem"
-                        :valid="valid"
-                        :isCartOpen="this.isCartOpen" :isSuccessOrder="this.isSuccessOrder"
-                        :cart="this.cart"></cart-component>
-            </div>
+    <main>
+        <div v-if='showProduct'>
+            <!--Start Sort & Search-->
+            <br><strong>Sort By</strong>
+            <p><button @click="sort('title')"><span class="fas fa-sort"></span></button> Lesson</p>
+            <p><button @click="sort('location')"><span class="fas fa-sort"></span></button> Location</p>
+            <p><button @click="sort('price')"><span class="fas fa-sort"></span></button> Price</p>
+            <p><button @click="sort('spaces')"><span class="fas fa-sort"></span></button> Spaces</p>
+            <p>  <input type="text" v-model="search" placeholder="Search lesson.."/></p>
+            <!--End Sort & Search-->
 
-            <lessons-component :lessons="this.lessons" :cart="this.cart"></lessons-component>
-            <checkout-component></checkout-component>
+            <!--Start Display Lessons-->
+            <div class="sty2" v-for="lesson in sortedLessons">
+                <img height="120px" width="120px"
+                     v-bind:src="lesson.image">
+                </img>
+                <div class="sty1">  <h2 v-text="lesson.title"></h2>
+                    <p v-text="lesson.location"></p>
+                    <p>Spaces: {{lesson.spaces}}</p>
+                    <p>Price: £{{lesson.price}}</p>
+                    <button @click='addToCart(lesson)'
+                            :disabled='!canAdd(lesson)' >
+                        <span class="fas fa-shopping-basket"></span>
+                        Add to basket
+                    </button>
+                    <span v-if="lesson.spaces === cartCount(lesson.id) ">No space left.</span>
+                    <span v-else-if="lesson.spaces - cartCount(lesson.id) < 3">{{lesson.spaces - cartCount(lesson.id)}} spaces left!</span>
+                    <span v-else>  Book now!  </span>
+                </div> </div>
+            <!--End Display Lessons-->
         </div>
-    </section>
+
+        <div v-else>
+            <!--Start Checkout Page-->
+            <br><button @click='retLessons'><span class="fas fa-arrow-circle-left"></span> Lessons</button>
+            <h2>Checkout</h2>
+            <form @submit="purchase()">
+                <p>
+                    <strong>First Name:</strong>
+                    <input v-model="order.firstName" title="Letters only." required/>
+                </p>
+                <p>
+                    <strong>Last Name:</strong>
+                    <input v-model="order.lastName"  title="Letters only." required/>
+                </p>
+                <p>
+                    <strong>Phone Number:</strong>
+                    <input v-model="order.number" minlength="10" title="Numbers only." required/>
+                </p>
+                <p>
+                    <strong>Country:</strong>
+                    <select v-model="order.country" required>
+                        <option disabled value="">Country</option>
+                        <option v-for="(country, key) in countries"
+                                v-bind:value="country">
+                            {{key}}</option>
+                    </select>
+                </p>
+                <button @Click="orderCompl" :disabled='!validForm'>Complete Purchase</button>
+            </form>
+
+            <h2>Purchase Information</h2>
+            <p>First Name: {{order.firstName}}</p>
+            <p>Last Name: {{order.lastName}}</p>
+            <p>Phone Number: {{order.number}}</p>
+            <p>Country: {{order.country}}</p>
+            <div v-for="lesson in cart">
+                <img height="120px" width="120px"
+                     v-bind:src="lesson.image">
+                </img>
+                <div class="sty1">  <h2 v-text="lesson.title"></h2>
+                    <p v-text="lesson.location"></p>
+                    <p>Spaces: {{lesson.spaces}}</p>
+                    <p>Price: £{{lesson.price}}</p>
+                    <button @click="deleteLesson(lesson)">Delete</button>
+                </div>
+            </div>
+            <!--End Checkout Page-->
+        </div>
+    </main>
 </div>
+<!--Vue Instance && Functions-->
+<script>
+    let clubstore = new Vue({
+            el: '#app' ,
+            data: {
+                search: '',
+                showProduct: true,
+                sitename: 'After School Club',
+                lessons: [],
+                order: {
+                    firstName: '',
+                    lastName: '',
+                    number:'',
+                    state:'',
+                },
+                countries: {
+                    ENG: 'England',
+                    WAL: 'Wales',
+                    SCT: 'Scotland',
+                    NIR: 'Northern Ireland'
+                },
 
-<!--Service Worker-->
-<script src="js/register.js" type="module"></script>
+                cart: [],
+                sortBy: 'title',
+                sortDir: 'asc',
+            },
 
-<!-- Vue components unpack -->
-<script src="https://cdn.jsdelivr.net/npm/vue@2.5.1/dist/vue.min.js"></script>
+            created: function() {
 
-<!--Vue modules-->
-<script type="module">
-    import vueState from './js/index.js'
+                //load lessons from database using fetch
+                fetch('https://mdx3145.herokuapp.com/collection/lessons').then(
+                    function (response) {
+                        response.json().then(
+                            function (json) {
+                                clubstore.lessons = json;
+                            }
+                        )
+                    }
+                )
 
-    new Vue(vueState)
+            },
+            computed: {
+                sortedLessons: function() {
+                    return this.lessons.sort((a, b) =>{
+                        let modifier = 1;
+                        if(this.sortDir === 'desc') modifier = -1;
+                        if(a[this.sortBy] < b[this.sortBy]) return -1 * modifier;
+                        if(a[this.sortBy] > b[this.sortBy]) return 1 * modifier;
+                        return 0;
+                    })
+                },
+                validForm: function() {
+                    var namevalid = /^[a-zA-Z]+$/
+                    var numvalid = /^\d+$/
+                    if (namevalid.test(this.order.firstName) && namevalid.test(this.order.lastName)
+                        && numvalid.test(this.order.number) && (this.cart.length > 0)) {
+                        return true;
+                    }
+                    else
+                        return false;
+                },
+                /*filteredList: function() {
+                    return this.lessons.filter((lesson) => {
+                        return lesson.title.match(this.search);
+                    })
+                },*/
+            },
+
+            methods: {
+                addToCart(lesson) {
+                    if ('canAdd(lesson'){
+                        this.cart.push(lesson )
+                        lesson.spaces--;
+                    }
+                },
+                showCheckout() {
+                    if (this.cart.length > 0 ){
+                        this.showProduct = this.showProduct ? false : true;}
+
+                },
+                retLessons() {
+                    this.showProduct = true;
+
+                },
+                cartCount(id) {
+                    let count = 0;
+                    for(let i = 0; i < this.cart.length; i++) {
+                        if (this.cart[i] === id) {
+                            count++;
+                        }
+                    }
+                    return count;
+
+                },
+                deleteLesson(lesson) {
+                    var idx = this.cart.indexOf(lesson)
+                    this.cart.splice(idx, 1)
+                    lesson.spaces++;
+                },
+                canAdd(lesson) {
+                    return lesson.spaces;
+                },
+                sort(s) {
+                    if(s === this.sortBy) {
+                        this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+                    }
+                    this.sortBy = s
+                    return this.lessons.filter((lesson) => {
+                        return lesson.title.match(this.search);
+                    })
+
+                },
+
+                orderCompl() {
+                    const newOrder = { "first name": this.order.firstName,
+                        "last name": this.order.lastName, "number": this.order.number, "order" : this.cart}
+
+                    fetch ('https://mdx3145.herokuapp.com/collection/orders', {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type" : "application/json",
+                        },
+                        body: JSON.stringify(newOrder),
+                    }).then(function (response) {
+                        response.json().then(
+                            console.log("Order placed in database")
+                        )
+                        alert ("Order submitted.")
+                    })
+
+
+                },
+                purchase() {
+                    if (this.cart.length > 0) {
+                        alert('Purchase Submitted!')}
+                }
+            }
+
+        }
+    );
 </script>
+<!--End Vue Instance && Functions-->
 
 </body>
-
 </html>
