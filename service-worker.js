@@ -35,9 +35,7 @@ self.addEventListener('activate', function (event) {
     return self.clients.claim();
 });
 
-
 self.addEventListener('fetch', (event) => {
-    if (!(event.request.url.indexOf('http') === 0)) return; // skip the request. if request is not made with http protocol
     event.respondWith(
         caches.match(event.request).then(
             cacheRes =>
