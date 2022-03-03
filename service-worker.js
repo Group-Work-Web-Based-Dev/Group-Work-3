@@ -1,4 +1,4 @@
-const cacheName = 'v12'
+const cacheName = 'v1'
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -30,10 +30,10 @@ self.addEventListener('install', (event) => {
     )
 })
 
-// self.addEventListener('activate', function (event) {
-//     console.log('Claiming control');
-//     return self.clients.claim();
-// });
+self.addEventListener('activate', function (event) {
+    console.log('Claiming control');
+    return self.clients.claim();
+});
 
 self.addEventListener('fetch', (event) => {
     if (!(event.request.url.indexOf('http') === 0)) return; // skip the request. if request is not made with http protocol
@@ -43,7 +43,7 @@ self.addEventListener('fetch', (event) => {
                 cacheRes ||
                 fetch(event.request).then(fetchRes =>
                     caches.open(cacheName).then(cache => {
-                        cache?.put(event.request.url, fetchRes.clone());
+                        if ('put' in cache) cache.put(event.request.url, fetchRes.clone())
                         return fetchRes;
                     })
                 )
