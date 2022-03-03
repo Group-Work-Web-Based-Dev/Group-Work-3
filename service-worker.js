@@ -1,4 +1,4 @@
-const cacheName = 'v1'
+const cacheName = 'v10'
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -36,14 +36,15 @@ self.addEventListener('activate', function (event) {
 });
 
 self.addEventListener('fetch', (event) => {
-    if (!(event.request.url.indexOf('http') === 0)) return; // skip the request. if request is not made with http protocol
     event.respondWith(
         caches.match(event.request).then(
             cacheRes =>
                 cacheRes ||
                 fetch(event.request).then(fetchRes =>
-                    caches.open(cacheName).then(cache => {
-                        if ('put' in cache) cache.put(event.request.url, fetchRes.clone())
+                    caches.open(cacheName).then(async cache => {
+                        cache.put(event.request.url, fetchRes.clone()).then(res => {
+                            console.log(`Successfully saved [${res}]`)
+                        }).catch(() => cache.match(event.request.url))
                         return fetchRes;
                     })
                 )
